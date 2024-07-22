@@ -1,13 +1,20 @@
-import express, { Request, Response } from 'express';
+import express from "./config/express";
+import { connect } from "./config/db";
 import Logger from './config/logger';
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 4941;
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('Hello, TypeScript with Express!');
-});
+async function main() {
+  try {
+    await connect();
+    app.listen(port, () => {
+      Logger.info(`Listening on port: ${port}`);
+    });
+  } catch (err) {
+    Logger.error(`Unable to connect to the database.\n${err}`)
+    process.exit(-1);
+  }
+}
 
-app.listen(port, () => {
-  Logger.info(`Server is running at http://localhost:${port}`);
-});
+main().catch((err) => Logger.error(err));
