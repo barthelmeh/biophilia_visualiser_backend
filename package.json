@@ -14,6 +14,7 @@
   "author": "Tom Barthelmeh",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "mssql": "^11.0.1",
@@ -21,6 +22,7 @@
     "winston": "^3.13.1"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/express": "^4.17.21",
     "@types/mssql": "^9.1.5",
     "@types/node": "^20.14.11",
