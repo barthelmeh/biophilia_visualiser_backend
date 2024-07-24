@@ -30,4 +30,17 @@ const login = async (req: Request, res: Response): Promise<void> => {
     }
 }
 
-export { login }
+const logout = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const userId = req.body.userId;
+        await User.logout(userId);
+        res.status(200).send();
+    } catch (err) {
+        Logger.error(err);
+        res.statusMessage = "Internal Server Error";
+        res.status(500).send();
+        return;
+    }
+}
+
+export { login, logout }
