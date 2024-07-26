@@ -51,6 +51,44 @@ const getParticipants = async (req: Request, res: Response): Promise<void> => {
 }
 
 
+// Get a singular participant by id
+const getParticipant = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const id = parseInt(req.params.id, 10);
+        const participant: Participant = await User.getParticipant(id);
+
+        res.status(200).send(participant);
+        return;
+    } catch (err) {
+        Logger.error(err);
+        res.statusMessage = 'Internal server error';
+        res.status(500).send();
+    }
+}
+
+
+// Delete participant
+const deleteParticipant = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const id = parseInt(req.params.id, 10);
+        const rowsAffected = await User.deleteParticipant(id);
+
+        if(rowsAffected[0] > 0) {
+            res.status(200).send();
+            return;
+        }
+
+        res.status(204).send('No content');
+        return;
+    } catch (err) {
+        Logger.error(err);
+        res.statusMessage = 'Internal server error';
+        res.status(500).send();
+        return;
+    }
+}
+
+
 // Administrator login
 const login = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -94,4 +132,4 @@ const logout = async (req: Request, res: Response): Promise<void> => {
     }
 }
 
-export { createParticipant, getParticipants, login, logout }
+export { createParticipant, getParticipants, getParticipant, deleteParticipant, login, logout }

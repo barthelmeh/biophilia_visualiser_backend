@@ -11,8 +11,15 @@ module.exports = (app: Express) => {
     .post(authenticate, user.logout);
 
     app.route(rootUrl + '/participant')
-    .post(user.createParticipant);
+    .get(authenticate, user.getParticipants);
 
     app.route(rootUrl + '/participant')
-    .get(authenticate, user.getParticipants);
+    .post(user.createParticipant);
+
+    app.route(rootUrl + '/participant/:id')
+    .get(authenticate, user.getParticipant);
+
+    app.route(rootUrl + '/participant/:id')
+    .delete(authenticate, user.deleteParticipant);
+
 }

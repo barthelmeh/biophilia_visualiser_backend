@@ -33,28 +33,31 @@ const getAllParticipants = async (): Promise<Participant[] | null> => {
     return participants;
 }
 
-// const getParticipant = async (id: number): Promise<Participant | null> => {
-//     const query = `SELECT * FROM participant WHERE id = @id`;
-//     const result = await getPool().request()
-//         .input('id', sql.Int, id)
-//         .query(query);
+const getParticipant = async (id: number): Promise<Participant | null> => {
+    const query = `SELECT Id as id, FirstName as firstName, LastName as lastName, Email as email, Gender as gender, Age as age, ActivityLevel as activityLevel, HasAcceptedTerms as hasAcceptedTerms
+                   FROM Participant WHERE Id = @id`;
+    const result = await getPool().request()
+        .input('id', sql.Int, id)
+        .query(query);
 
-//     // No participant found with ID
-//     if (result.recordset.length == 0) {
-//         return null;
-//     }
+    // No participant found with ID
+    if (result.recordset.length === 0) {
+        return null;
+    }
 
-//     const row = result.recordset[0];
-//     const participant: Participant = {
-//         id: row.id,
-//         firstName: row.first_name,
-//         lastName: row.last_name,
-//         email: row.email,
-//         age: row.age,
-
-//     }
-//     return participant;
-// }
+    const row = result.recordset[0];
+    const participant: Participant = {
+        id: row.id as number,
+        firstName: row.firstName,
+        lastName: row.lastName,
+        email: row.email,
+        age: row.age,
+        gender: convertStringToEnum(gender, row.gender),
+        activityLevel: convertStringToEnum(activityLevel, row.activityLevel),
+        hasAcceptedTerms: row.hasAcceptedTerms
+    };
+    return participant;
+}
 
 const registerParticipant = async (participant: ParticipantRegister): Promise<number | null> => {
     const query = `
@@ -76,6 +79,14 @@ const registerParticipant = async (participant: ParticipantRegister): Promise<nu
         return result.recordset[0].id as number;
     }
     return null;
+}
+
+const deleteParticipant = async (id: number): Promise<number[]> => {
+    const query = 'DELETE FROM Participant WHERE Id = @id';
+    const result = await getPool().request()
+        .input('Id', id)
+        .query(query);
+    return result.rowsAffected;
 }
 
 const getAdministratorByUsername = async (username: string): Promise<Administrator | null> => {
@@ -122,4 +133,4 @@ const logout = async (id: number): Promise<number[]> => {
     return result.rowsAffected;
 }
 
-export { registerParticipant, getAllParticipants, getAdministratorByUsername, getAdministratorByToken, login, logout }
+export { registerParticipant, getAllParticipants, getParticipant, deleteParticipant, getAdministratorByUsername, getAdministratorByToken, login, logout }
