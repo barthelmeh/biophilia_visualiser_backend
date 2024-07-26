@@ -29,6 +29,18 @@ const getAdministratorByUsername = async (username: string): Promise<Administrat
     return null;
 }
 
+const getAdministratorByToken = async (token: string): Promise<Administrator | null> => {
+    const query = `SELECT Id as id, Username as username, Password as password, Token as token FROM Administrator WHERE token = @token`;
+    const result = await getPool().request()
+        .input('token', token)
+        .query(query);
+
+    if(result.recordset.length > 0) {
+        return result.recordset[0] as Administrator;
+    }
+    return null;
+}
+
 // Administrator login
 const login = async (id: number, token: string): Promise<number[]> => {
     // TODO: Update query to reflect schema
@@ -42,12 +54,30 @@ const login = async (id: number, token: string): Promise<number[]> => {
 
 // Administrator logout
 const logout = async (id: number): Promise<number[]> => {
-    const query = `UPDATE administrator SET auth_token = NULL WHERE id = @id`;
+    const query = `UPDATE administrator SET Token = NULL WHERE id = @id`;
     const result = await getPool().request()
         .input('id', sql.Int, id)
         .query(query);
     return result.rowsAffected;
 }
+
+// const getAllParticipants = async (id: number): Promise<Participant[] | null> => {
+//     const query = ``;
+//     const result = await getPool().request()
+//         .input()
+//         .query(query);
+
+//     // No participant found with ID
+//     if (result.recordset.length == 0) {
+//         return null;
+//     }
+
+//     const participants: Participant[] = [];
+
+//     for(const row of result.recordset) {
+
+//     }
+// }
 
 // const getParticipant = async (id: number): Promise<Participant | null> => {
 //     const query = `SELECT * FROM participant WHERE id = @id`;
@@ -57,7 +87,7 @@ const logout = async (id: number): Promise<number[]> => {
 
 //     // No participant found with ID
 //     if (result.recordset.length == 0) {
-//         return null
+//         return null;
 //     }
 
 //     const row = result.recordset[0];
@@ -72,4 +102,4 @@ const logout = async (id: number): Promise<number[]> => {
 //     return participant;
 // }
 
-export { register, getAdministratorByUsername, login, logout }
+export { register, getAdministratorByUsername, getAdministratorByToken, login, logout }

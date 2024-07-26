@@ -32,9 +32,10 @@ const login = async (req: Request, res: Response): Promise<void> => {
 
 const logout = async (req: Request, res: Response): Promise<void> => {
     try {
-        const userId = req.body.userId;
-        await User.logout(userId);
+        const authId = req.body.authId;
+        await User.logout(authId);
         res.status(200).send();
+        return;
     } catch (err) {
         Logger.error(err);
         res.statusMessage = "Internal Server Error";
