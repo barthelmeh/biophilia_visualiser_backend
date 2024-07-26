@@ -1,15 +1,15 @@
-type Participant = {
-    id: number,
+type ParticipantRegister = {
     firstName: string,
     lastName: string,
     email: string,
     age: number,
-    gender: import('../constants').gender,
-    activityLevel: import('../constants').activityLevel,
+    gender: string,
+    activityLevel: string,
     hasAcceptedTerms: boolean
 }
 
-type ParticipantRegister = {
+type Participant = {
+    id: number,
     firstName: string,
     lastName: string,
     email: string,
