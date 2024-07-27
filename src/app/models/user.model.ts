@@ -37,7 +37,7 @@ const getParticipant = async (id: number): Promise<Participant | null> => {
     const query = `SELECT Id as id, FirstName as firstName, LastName as lastName, Email as email, Gender as gender, Age as age, ActivityLevel as activityLevel, HasAcceptedTerms as hasAcceptedTerms
                    FROM Participant WHERE Id = @id`;
     const result = await getPool().request()
-        .input('id', sql.Int, id)
+        .input('id', id)
         .query(query);
 
     // No participant found with ID
@@ -81,13 +81,49 @@ const registerParticipant = async (participant: ParticipantRegister): Promise<nu
     return null;
 }
 
-const deleteParticipant = async (id: number): Promise<number[]> => {
-    const query = 'DELETE FROM Participant WHERE Id = @id';
-    const result = await getPool().request()
-        .input('Id', id)
-        .query(query);
-    return result.rowsAffected;
-}
+const deleteParticipant = async (participantId: number): Promise<number | null> => {
+    const pool = getPool();
+    const transaction = new sql.Transaction(pool);
+
+    try {
+        await transaction.begin();
+
+        // Step 1: Delete all data associated with sessions of the participant
+        const deleteDataQuery = `
+            DELETE FROM Data
+            WHERE SessionId IN (
+                SELECT Id FROM Session WHERE ParticipantId = @participantId
+            );
+        `;
+        await transaction.request()
+            .input('participantId', participantId)
+            .query(deleteDataQuery);
+
+        // Step 2: Delete all sessions of the participant
+        const deleteSessionsQuery = `
+            DELETE FROM Session WHERE ParticipantId = @participantId;
+        `;
+        await transaction.request()
+            .input('participantId', participantId)
+            .query(deleteSessionsQuery);
+
+        // Step 3: Delete the participant
+        const deleteParticipantQuery = `
+            DELETE FROM Participant WHERE Id = @id;
+        `;
+        const participantResult = await transaction.request()
+            .input('id', participantId)
+            .query(deleteParticipantQuery);
+
+        await transaction.commit();
+        return participantResult.rowsAffected[0];
+
+    } catch (err) {
+        await transaction.rollback();
+        return null;
+    }
+};
+
 
 const getAdministratorByUsername = async (username: string): Promise<Administrator | null> => {
     const query = `SELECT Id as id, Username as username, Password as password, Token as token FROM Administrator WHERE username = @username`;
@@ -118,8 +154,8 @@ const login = async (id: number, token: string): Promise<number[]> => {
     // TODO: Update query to reflect schema
     const query = `UPDATE Administrator SET Token = @token WHERE Id = @id`;
     const result = await getPool().request()
-        .input('id', sql.Int, id)
-        .input('token', sql.NVarChar, token)
+        .input('id', id)
+        .input('token', token)
         .query(query);
     return result.rowsAffected;
 }
@@ -128,7 +164,7 @@ const login = async (id: number, token: string): Promise<number[]> => {
 const logout = async (id: number): Promise<number[]> => {
     const query = `UPDATE administrator SET Token = NULL WHERE id = @id`;
     const result = await getPool().request()
-        .input('id', sql.Int, id)
+        .input('id', id)
         .query(query);
     return result.rowsAffected;
 }

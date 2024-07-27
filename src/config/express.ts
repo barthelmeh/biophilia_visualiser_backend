@@ -18,6 +18,7 @@ export default () => {
 
     // ROUTES
     require('../app/routes/user.routes')(app);
+    require('../app/routes/session.routes')(app);
 
     return app;
 }

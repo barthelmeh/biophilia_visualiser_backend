@@ -73,7 +73,7 @@ const deleteParticipant = async (req: Request, res: Response): Promise<void> => 
         const id = parseInt(req.params.id, 10);
         const rowsAffected = await User.deleteParticipant(id);
 
-        if(rowsAffected[0] > 0) {
+        if(rowsAffected > 0) {
             res.status(200).send();
             return;
         }
