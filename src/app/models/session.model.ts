@@ -2,7 +2,7 @@ import { getPool } from "../../config/db";
 import sql from 'mssql';
 
 // Create a new Session
-const createSession = async (session: SessionCreate): Promise<number | null> => {
+const createSession = async (session: SessionCreate): Promise<number> => {
 
     const pool = getPool();
     const transaction = new sql.Transaction(pool);
@@ -26,7 +26,7 @@ const createSession = async (session: SessionCreate): Promise<number | null> => 
 
         if (sessionResult.recordset.length === 0) {
             await transaction.rollback();
-            return null;
+            return 0;
         }
 
         const newSessionId = sessionResult.recordset[0].id as number;
@@ -51,7 +51,7 @@ const createSession = async (session: SessionCreate): Promise<number | null> => 
     } catch (err) {
         // Rollback the transaction in case of error
         await transaction.rollback();
-        return null;
+        return 0;
     }
 
 }
@@ -96,7 +96,7 @@ const getSessionById = async (sessionId: number): Promise<Session | null> => {
 
 
 // Delete session
-const deleteSession = async (sessionId: number): Promise<number | null> => {
+const deleteSession = async (sessionId: number): Promise<number> => {
 
     const pool = getPool();
     const transaction = new sql.Transaction(pool);
@@ -121,7 +121,7 @@ const deleteSession = async (sessionId: number): Promise<number | null> => {
 
     } catch (err) {
         await transaction.rollback();
-        return null;
+        return 0;
     }
 }
 
