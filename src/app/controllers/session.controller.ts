@@ -13,8 +13,6 @@ const createSession = async (req: Request, res: Response): Promise<void> => {
             data: req.body.data
         }
 
-        Logger.info(session);
-
         const insertedId = await Session.createSession(session);
 
         if(insertedId == null) {
