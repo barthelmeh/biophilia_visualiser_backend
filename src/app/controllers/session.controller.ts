@@ -39,6 +39,7 @@ const getSession = async (req: Request, res: Response): Promise<void> => {
 
         if(session == null) {
             res.status(404).send();
+            return;
         }
 
         res.status(200).send(session);
