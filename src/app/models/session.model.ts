@@ -105,10 +105,16 @@ const deleteSession = async (sessionId: number): Promise<number> => {
         await transaction.begin();
 
         // Delete associated data first
-        const deleteDataQuery = `DELETE FROM Data WHERE SessionId = @sessionId`;
+        const deleteDataQuery = `DELETE FROM Data WHERE SessionID = @sessionId`;
         await transaction.request()
             .input('sessionId', sessionId)
             .query(deleteDataQuery);
+
+        // Delete timeframes
+        const deleteTimeframesQuery = `DELETE FROM Timeframe WHERE SessionID = @sessionId`;
+        await transaction.request()
+            .input('sessionId', sessionId)
+            .query(deleteTimeframesQuery);
 
         // Delete the session
         const deleteSessionQuery = `DELETE FROM Session WHERE Id = @id`;
