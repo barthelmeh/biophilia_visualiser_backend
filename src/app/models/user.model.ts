@@ -161,23 +161,23 @@ const getAdministratorByToken = async (token: string): Promise<Administrator | n
 }
 
 // Administrator login
-const login = async (id: number, token: string): Promise<number[]> => {
+const login = async (id: number, token: string): Promise<number> => {
     // TODO: Update query to reflect schema
     const query = `UPDATE Administrator SET Token = @token WHERE Id = @id`;
     const result = await getPool().request()
         .input('id', id)
         .input('token', token)
         .query(query);
-    return result.rowsAffected;
+    return result.rowsAffected[0];
 }
 
 // Administrator logout
-const logout = async (id: number): Promise<number[]> => {
+const logout = async (id: number): Promise<number> => {
     const query = `UPDATE administrator SET Token = NULL WHERE id = @id`;
     const result = await getPool().request()
         .input('id', id)
         .query(query);
-    return result.rowsAffected;
+    return result.rowsAffected[0];
 }
 
 export { registerParticipant, getAllParticipants, getParticipant, deleteParticipant, getAdministratorByUsername, getAdministratorByToken, login, logout }
