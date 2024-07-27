@@ -58,6 +58,7 @@ const createSession = async (session: SessionCreate): Promise<number | null> => 
 
 // Get one session by its id
 const getSessionById = async (sessionId: number): Promise<Session | null> => {
+    // Get the session and data
     const query = `
     SELECT
         s.Id as sessionId,
@@ -70,26 +71,56 @@ const getSessionById = async (sessionId: number): Promise<Session | null> => {
         d.RecordedTime as dataRecordedTime
     FROM Session s
     LEFT JOIN Data d ON s.Id = d.SessionID
+    LEFT JOIN Timeframe t ON s.Id = t.SessionID
     WHERE s.Id = @id
     `;
-    const result = await getPool().request()
+    const sessionResult = await getPool().request()
         .input('id', sessionId)
         .query(query);
 
-    if(result.recordset.length === 0) {
+    if(sessionResult.recordset.length === 0) {
         return null;
     }
 
-    const row = result.recordset[0];
-    const session: Session = {
+    const row = sessionResult.recordset[0];
+    let session: Session = {
         id: row.sessionId as number,
         participantId: row.participantId,
         name: row.sessionName,
         start: row.sessionStart,
         end: row.sessionEnd,
-        data: result.recordset.map((dataRow) => ({id: dataRow.dataId, value: dataRow.dataValue, time: dataRow.dataRecordedTime}))
-
+        data: sessionResult.recordset.map((dataRow) => ({id: dataRow.dataId, value: dataRow.dataValue, time: dataRow.dataRecordedTime})),
     };
+
+    // Get the timeframes for the given session
+    const getTimeframeQuery = `
+    SELECT
+        t.Id as id,
+        t.SessionID as sessionId,
+        t.Description as description,
+        t.StartTime as startTime,
+        t.EndTime as endTime
+    FROM Session s
+    JOIN Timeframe t ON s.Id = t.SessionID
+    WHERE s.Id = @id;
+    `;
+    const timeframeResult = await getPool().request()
+        .input('id', sessionId)
+        .query(getTimeframeQuery);
+
+    if(timeframeResult.recordset.length > 0) {
+
+        // Add the timeframes to the session object
+        session = {...session,
+            timeframes: timeframeResult.recordset.map((timeframeRow) => ({
+                id: timeframeRow.id,
+                sessionId: timeframeRow.sessionId,
+                description: timeframeRow.description,
+                startTime: timeframeRow.startTime,
+                endTime: timeframeRow.endTime
+            }))
+        }
+    }
 
     return session;
 }

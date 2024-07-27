@@ -35,7 +35,11 @@ const createSession = async (req: Request, res: Response): Promise<void> => {
 const getSession = async (req: Request, res: Response): Promise<void> => {
     try {
         const id = parseInt(req.params.id, 10);
-        const session: Session = await Session.getSessionById(id);
+        const session: Session | null = await Session.getSessionById(id);
+
+        if(session == null) {
+            res.status(404).send();
+        }
 
         res.status(200).send(session);
     } catch (err) {

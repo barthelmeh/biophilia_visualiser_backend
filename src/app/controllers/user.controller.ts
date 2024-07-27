@@ -55,7 +55,11 @@ const getParticipants = async (req: Request, res: Response): Promise<void> => {
 const getParticipant = async (req: Request, res: Response): Promise<void> => {
     try {
         const id = parseInt(req.params.id, 10);
-        const participant: Participant = await User.getParticipant(id);
+        const participant: Participant | null = await User.getParticipant(id);
+
+        if(participant == null) {
+            res.status(404).send();
+        }
 
         res.status(200).send(participant);
         return;

@@ -12,6 +12,6 @@ type Session = {
     name: string,
     start: string,
     end: string,
-    data: Data[]
-
+    data: Data[],
+    timeframes?: Timeframe[]
 }
