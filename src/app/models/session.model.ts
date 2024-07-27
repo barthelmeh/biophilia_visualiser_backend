@@ -1,6 +1,5 @@
 import { getPool } from "../../config/db";
 import sql from 'mssql';
-import Logger from "../../config/logger";
 
 // Create a new Session
 const createSession = async (session: SessionCreate): Promise<number | null> => {
@@ -26,7 +25,6 @@ const createSession = async (session: SessionCreate): Promise<number | null> => 
             .query(query);
 
         if (sessionResult.recordset.length === 0) {
-            Logger.info("first");
             await transaction.rollback();
             return null;
         }
@@ -52,7 +50,6 @@ const createSession = async (session: SessionCreate): Promise<number | null> => 
 
     } catch (err) {
         // Rollback the transaction in case of error
-        Logger.error(err);
         await transaction.rollback();
         return null;
     }
