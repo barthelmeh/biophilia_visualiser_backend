@@ -8,8 +8,8 @@ const createSession = async (req: Request, res: Response): Promise<void> => {
         const session: SessionCreate = {
             participantId: req.body.participantId as number,
             name: req.body.name,
-            start: req.body.start,
-            end: req.body.end,
+            startTime: req.body.startTime,
+            endTime: req.body.endTime,
             data: req.body.data
         }
 

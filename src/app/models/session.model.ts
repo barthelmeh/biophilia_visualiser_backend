@@ -20,8 +20,8 @@ const createSession = async (session: SessionCreate): Promise<number | null> => 
         const sessionResult = await transaction.request()
             .input('ParticipantId', session.participantId)
             .input('Name', session.name)
-            .input('Start', session.start)
-            .input('End', session.end)
+            .input('Start', session.startTime)
+            .input('End', session.endTime)
             .query(query);
 
         if (sessionResult.recordset.length === 0) {

@@ -1,8 +1,8 @@
 type SessionCreate = {
     participantId: number,
     name: string,
-    start: string,
-    end: string,
+    startTime: string,
+    endTime: string,
     data: DataCreate[]
 }
 
