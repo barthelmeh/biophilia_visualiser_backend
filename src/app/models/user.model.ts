@@ -88,26 +88,37 @@ const deleteParticipant = async (participantId: number): Promise<number | null> 
     try {
         await transaction.begin();
 
-        // Step 1: Delete all data associated with sessions of the participant
+        // Delete all data associated with sessions of the participant
         const deleteDataQuery = `
             DELETE FROM Data
-            WHERE SessionId IN (
-                SELECT Id FROM Session WHERE ParticipantId = @participantId
+            WHERE SessionID IN (
+                SELECT Id FROM Session WHERE ParticipantID = @participantId
             );
         `;
         await transaction.request()
             .input('participantId', participantId)
             .query(deleteDataQuery);
 
-        // Step 2: Delete all sessions of the participant
+        // Delete all timeframes of the sessions of the participant
+        const deleteTimeframesQuery = `
+            DELETE FROM Timeframe
+            WHERE SessionID IN (
+                SELECT Id FROM Session WHERE ParticipantID = @participantId
+            );
+        `;
+        await transaction.request()
+            .input('participantId', participantId)
+            .query(deleteTimeframesQuery);
+
+        // Delete all sessions of the participant
         const deleteSessionsQuery = `
-            DELETE FROM Session WHERE ParticipantId = @participantId;
+            DELETE FROM Session WHERE ParticipantID = @participantId;
         `;
         await transaction.request()
             .input('participantId', participantId)
             .query(deleteSessionsQuery);
 
-        // Step 3: Delete the participant
+        // Delete the participant
         const deleteParticipantQuery = `
             DELETE FROM Participant WHERE Id = @id;
         `;
