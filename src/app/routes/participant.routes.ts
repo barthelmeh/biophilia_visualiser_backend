@@ -9,7 +9,7 @@ module.exports = (app: Express) => {
     .get(authenticate, participant.getParticipants);
 
     app.route(rootUrl + '/participant')
-    .post(participant.createParticipant);
+    .post(authenticate, participant.createParticipant);
 
     app.route(rootUrl + '/participant/:id')
     .get(authenticate, participant.getParticipant);
