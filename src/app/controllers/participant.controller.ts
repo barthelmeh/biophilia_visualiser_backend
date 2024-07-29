@@ -1,9 +1,6 @@
 import { Request, Response } from 'express';
 import Logger from '../../config/logger';
-import * as User from '../models/user.model';
-import * as Password from '../services/password';
-import {uid} from 'rand-token';
-
+import * as Participant from '../models/participant.model';
 
 // Create a participant
 const createParticipant = async (req: Request, res: Response): Promise<void> => {
@@ -18,14 +15,14 @@ const createParticipant = async (req: Request, res: Response): Promise<void> => 
             hasAcceptedTerms: req.body.hasAcceptedTerms,
         };
 
-        const insertedId = await User.registerParticipant(newParticipant);
+        const insertedId = await Participant.registerParticipant(newParticipant);
 
         if(insertedId == null) {
             res.statusMessage = 'Unable to insert participant';
             res.status(422).send();
             return;
         }
-        res.status(201).send({"userId": insertedId});
+        res.status(201).send({"participantId": insertedId});
         return;
     } catch (err) {
         Logger.error(err);
@@ -39,7 +36,7 @@ const createParticipant = async (req: Request, res: Response): Promise<void> => 
 // Get all participants
 const getParticipants = async (req: Request, res: Response): Promise<void> => {
     try {
-        const participants: Participant[] = await User.getAllParticipants();
+        const participants: Participant[] = await Participant.getAllParticipants();
         res.status(200).send(participants);
         return;
     } catch (err) {
@@ -55,7 +52,7 @@ const getParticipants = async (req: Request, res: Response): Promise<void> => {
 const getParticipant = async (req: Request, res: Response): Promise<void> => {
     try {
         const id = parseInt(req.params.id, 10);
-        const participant: Participant | null = await User.getParticipant(id);
+        const participant: Participant | null = await Participant.getParticipant(id);
 
         if(participant == null) {
             res.status(404).send();
@@ -75,7 +72,7 @@ const getParticipant = async (req: Request, res: Response): Promise<void> => {
 const deleteParticipant = async (req: Request, res: Response): Promise<void> => {
     try {
         const id = parseInt(req.params.id, 10);
-        const rowsAffected = await User.deleteParticipant(id);
+        const rowsAffected = await Participant.deleteParticipant(id);
 
         if(rowsAffected > 0) {
             res.status(200).send();
@@ -92,48 +89,4 @@ const deleteParticipant = async (req: Request, res: Response): Promise<void> => 
     }
 }
 
-
-// Administrator login
-const login = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const user = await User.getAdministratorByUsername(req.body.username);
-
-        if(user == null || !(await Password.compare(req.body.password, user.password))) {
-            res.statusMessage = `Invalid username/password`;
-            res.status(401).send();
-            return;
-        }
-
-        // Generate the login token
-        const token = uid(64);
-
-        await User.login(user.id, token);
-
-        res.status(200).send({"userId": user.id, "token": token});
-        return;
-
-    } catch (err) {
-        Logger.error(err);
-        res.statusMessage = "Internal Server Error";
-        res.status(500).send();
-        return;
-    }
-}
-
-
-// Administrator logout
-const logout = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const authId = req.body.authId;
-        await User.logout(authId);
-        res.status(200).send();
-        return;
-    } catch (err) {
-        Logger.error(err);
-        res.statusMessage = "Internal Server Error";
-        res.status(500).send();
-        return;
-    }
-}
-
-export { createParticipant, getParticipants, getParticipant, deleteParticipant, login, logout }
+export { createParticipant, getParticipants, getParticipant, deleteParticipant }

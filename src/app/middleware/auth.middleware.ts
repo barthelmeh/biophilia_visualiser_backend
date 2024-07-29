@@ -1,18 +1,18 @@
 import { NextFunction, Request, Response } from 'express';
 import Logger from '../../config/logger';
-import { getAdministratorByToken } from '../models/user.model';
+import { getAdministratorByToken } from '../models/admin.model';
 
 const authenticate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try{
         const token = req.header('X-Authorisation');
-        const user = await getAdministratorByToken(token);
+        const admin = await getAdministratorByToken(token);
 
-        if(user == null) {
+        if(admin == null) {
             res.statusMessage = 'Unauthorised';
             res.status(401).send();
             return;
         }
-        req.body.authId = user.id;
+        req.body.authId = admin.id;
         next();
         return;
     } catch (err) {
