@@ -55,7 +55,7 @@ const getParticipant = async (req: Request, res: Response): Promise<void> => {
         const participant: Participant | null = await Participant.getParticipant(id);
 
         if(participant == null) {
-            res.status(404).send();
+            res.status(404).send('Participant not found');
         }
 
         res.status(200).send(participant);

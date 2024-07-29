@@ -64,7 +64,7 @@ const updateTimeframe = async (req: Request, res: Response): Promise<void> => {
             return;
         }
 
-        res.status(204).send('No content');
+        res.status(404).send();
         return;
 
     } catch (err) {
