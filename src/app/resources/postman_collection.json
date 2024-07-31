@@ -1,0 +1,1121 @@
+{
+	"info": {
+		"_postman_id": "3fdd200b-dc6a-4edc-8856-045b56855092",
+		"name": "SENG402",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "33834698"
+	},
+	"item": [
+		{
+			"name": "invalid login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status Code 401\", function() {",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"incorrect_password\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{BASE_URL}}/admin/login"
+			},
+			"response": []
+		},
+		{
+			"name": "invalid login request",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status Code 400\", function() {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"admin\",\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{BASE_URL}}/admin/login"
+			},
+			"response": []
+		},
+		{
+			"name": "login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status Code 200\", function() {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Expected response\", function() {",
+							"    pm.expect(pm.response.json().token).to.be.a('string')",
+							"    pm.expect(pm.response.json().adminId).to.be.a('number')",
+							"});",
+							"",
+							"pm.test(\"Set auth_token and user_id after login\", function() {",
+							"    const authToken = pm.response.json().token;",
+							"    if (typeof authToken !== \"undefined\") {",
+							"        pm.environment.set(\"token\", authToken);",
+							"    }",
+							"    const userId = pm.response.json().userId;",
+							"    if (typeof userId !== \"undefined\") {",
+							"        pm.environment.set(\"userId\", userId);",
+							"    }",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{BASE_URL}}/admin/login"
+			},
+			"response": []
+		},
+		{
+			"name": "create a new participant",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 201\", function() {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Expected response\", function() {",
+							"    pm.expect(pm.response.json().userId).to.be.a('number')",
+							"});",
+							"",
+							"pm.environment.set(\"newParticipantId\", pm.response.json().userId);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"firstName\": \"Postman\",\n    \"lastName\": \"Test\",\n    \"email\": \"postman.test@email.com\",\n    \"age\": 20,\n    \"activityLevel\": \"SEDENTARY\",\n    \"gender\": \"MALE\",\n    \"hasAcceptedTerms\": true\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{BASE_URL}}/participant"
+			},
+			"response": []
+		},
+		{
+			"name": "create new participant incorrect",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 400\", function() {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"lastName\": \"Test\",\n    \"activityLevel\": \"SEDENTARY\",\n    \"gender\": \"MALE\",\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{BASE_URL}}/participant"
+			},
+			"response": []
+		},
+		{
+			"name": "get all participants",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 200\", function() {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-Authorisation",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": "{{BASE_URL}}/participant"
+			},
+			"response": []
+		},
+		{
+			"name": "get all participants unauthorised",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 401\", function() {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "{{BASE_URL}}/participant"
+			},
+			"response": []
+		},
+		{
+			"name": "get single participant",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 200\", function() {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var expectedData = {",
+							"    \"id\": 9,",
+							"    \"firstName\": \"Postman\",",
+							"    \"lastName\": \"Test\",",
+							"    \"email\": \"postman.test@email.com\",",
+							"    \"age\": 20,",
+							"    \"gender\": \"male\",",
+							"    \"activityLevel\": \"Sedentary (little or no exercise)\",",
+							"    \"hasAcceptedTerms\": true",
+							"}",
+							"",
+							"pm.test(\"Expected data\", function() {",
+							"    try {",
+							"        var data = pm.response.json()",
+							"        pm.expect(data.firstName).to.equal(expectedData.firstName)",
+							"        pm.expect(data.lastName).to.equal(expectedData.lastName)",
+							"        pm.expect(data.email).to.equal(expectedData.email)",
+							"        pm.expect(data.age).to.equal(expectedData.age)",
+							"        pm.expect(data.gender).to.equal(expectedData.gender)",
+							"        pm.expect(data.activityLevel).to.equal(expectedData.activityLevel)",
+							"        pm.expect(data.hasAcceptedTerms).to.equal(expectedData.hasAcceptedTerms)",
+							"    } catch (err) {",
+							"        pm.expect.fail(\"INVALID RESPONSE\")",
+							"    }",
+							"    ",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-Authorisation",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": "{{BASE_URL}}/participant/{{newParticipantId}}"
+			},
+			"response": []
+		},
+		{
+			"name": "get participant that doesn't exist",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 404\", function() {",
+							"    pm.response.to.have.status(404);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-Authorisation",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": "{{BASE_URL}}/participant/99999999"
+			},
+			"response": []
+		},
+		{
+			"name": "create a new session",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 201\", function() {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Expected response\", function() {",
+							"    pm.expect(pm.response.json().sessionId).to.be.a('number')",
+							"});",
+							"",
+							"pm.environment.set(\"newSessionId\", pm.response.json().sessionId);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-Authorisation",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"participantId\": {{newParticipantId}},\n    \"name\": \"Test Session\",\n    \"startTime\": \"2024-07-27T14:45:00Z\",\n    \"endTime\": \"2024-07-27T15:00:00Z\",\n    \"data\": [\n        {\n            \"value\": 50,\n            \"time\": \"2024-07-27T14:45:00Z\"\n        },\n        {\n            \"value\": 51,\n            \"time\": \"2024-07-27T14:45:01Z\"\n        },\n        {\n            \"value\": 52,\n            \"time\": \"2024-07-27T14:45:02Z\"\n        },\n        {\n            \"value\": 53,\n            \"time\": \"2024-07-27T14:45:03Z\"\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{BASE_URL}}/session"
+			},
+			"response": []
+		},
+		{
+			"name": "create a new session incorrect",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 400\", function() {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-Authorisation",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Test Session\",\n    \"startTime\": \"2024-07-27T14:45:00Z\",\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{BASE_URL}}/session"
+			},
+			"response": []
+		},
+		{
+			"name": "create a new timeframe",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 201\", function() {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Expected response\", function() {",
+							"    pm.expect(pm.response.json().timeframeId).to.be.a('number')",
+							"});",
+							"",
+							"pm.environment.set(\"newTimeframeId\", pm.response.json().timeframeId);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-Authorisation",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"sessionId\": {{newSessionId}},\n    \"description\": \"This is a test timeframe\",\n    \"startTime\": \"2024-07-27T14:45:00Z\",\n    \"endTime\": \"2024-07-27T15:00:00Z\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{BASE_URL}}/timeframe"
+			},
+			"response": []
+		},
+		{
+			"name": "create new timeframe incorrect",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 400\", function() {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-Authorisation",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"description\": \"This is a test timeframe\",\n    \"startTime\": \"2024-07-27T14:45:00Z\",\n    \"endTime\": \"2024-07-27T15:00:00Z\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{BASE_URL}}/timeframe"
+			},
+			"response": []
+		},
+		{
+			"name": "get single session",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 200\", function() {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var expectedData = {",
+							"    \"id\": pm.environment.get(\"newSessionId\"),",
+							"    \"participantId\": pm.environment.get(\"newParticipantId\"),",
+							"    \"name\": \"Test Session\",",
+							"    \"start\": \"2024-07-27T14:45:00.000Z\",",
+							"    \"end\": \"2024-07-27T15:00:00.000Z\",",
+							"}",
+							"",
+							"pm.test(\"Expected data\", function() {",
+							"    try {",
+							"        var data = pm.response.json()",
+							"        pm.expect(data.id).to.equal(expectedData.id)",
+							"        pm.expect(data.participantId).to.equal(expectedData.participantId)",
+							"        pm.expect(data.name).to.equal(expectedData.name)",
+							"        pm.expect(data.start).to.equal(expectedData.start)",
+							"        pm.expect(data.end).to.equal(expectedData.end)",
+							"        pm.expect(data).to.have.property(\"data\");",
+							"        pm.expect(data).to.have.property(\"timeframes\");",
+							"    } catch (err) {",
+							"        pm.expect.fail(\"INVALID RESPONSE\")",
+							"    }",
+							"    ",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-Authorisation",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": "{{BASE_URL}}/session/{{newSessionId}}"
+			},
+			"response": []
+		},
+		{
+			"name": "get single session anauthorised",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 401\", function() {",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "{{BASE_URL}}/session/{{newSessionId}}"
+			},
+			"response": []
+		},
+		{
+			"name": "get session that doesn't exist",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 404\", function() {",
+							"    pm.response.to.have.status(404);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-Authorisation",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": "{{BASE_URL}}/session/999999"
+			},
+			"response": []
+		},
+		{
+			"name": "update timeframe",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 200\", function() {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "X-Authorisation",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"description\": \"A new description\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{BASE_URL}}/timeframe/{{newTimeframeId}}"
+			},
+			"response": []
+		},
+		{
+			"name": "update timeframe doesn't exist",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 404\", function() {",
+							"    pm.response.to.have.status(404);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "X-Authorisation",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"description\": \"A new description\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{BASE_URL}}/timeframe/99999"
+			},
+			"response": []
+		},
+		{
+			"name": "get updated timeframe from session",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 200\", function() {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var expectedData = {",
+							"    \"id\": pm.environment.get(\"newSessionId\"),",
+							"    \"participantId\": pm.environment.get(\"newParticipantId\"),",
+							"    \"name\": \"Test Session\",",
+							"    \"start\": \"2024-07-27T14:45:00.000Z\",",
+							"    \"end\": \"2024-07-27T15:00:00.000Z\",",
+							"}",
+							"",
+							"var expectedTimeframes = [",
+							"    ",
+							"]",
+							"",
+							"pm.test(\"Expected data\", function() {",
+							"    try {",
+							"        var data = pm.response.json()",
+							"        pm.expect(data.id).to.equal(expectedData.id)",
+							"        pm.expect(data.participantId).to.equal(expectedData.participantId)",
+							"        pm.expect(data.name).to.equal(expectedData.name)",
+							"        pm.expect(data.start).to.equal(expectedData.start)",
+							"        pm.expect(data.end).to.equal(expectedData.end)",
+							"        pm.expect(data).to.have.property(\"data\");",
+							"        pm.expect(data).to.have.property(\"timeframes\");",
+							"    } catch (err) {",
+							"        pm.expect.fail(\"INVALID RESPONSE\")",
+							"    }",
+							"    ",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-Authorisation",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": "{{BASE_URL}}/session/{{newSessionId}}"
+			},
+			"response": []
+		},
+		{
+			"name": "delete timeframe unauthorised",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 401\", function() {",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "{{BASE_URL}}/timeframe/{{newTimeframeId}}"
+			},
+			"response": []
+		},
+		{
+			"name": "delete timeframe",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 200\", function() {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.environment.set(\"newTimeframeId\", null);",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "X-Authorisation",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": "{{BASE_URL}}/timeframe/{{newTimeframeId}}"
+			},
+			"response": []
+		},
+		{
+			"name": "delete timeframe wrong id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 400\", function() {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "X-Authorisation",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": "{{BASE_URL}}/timeframe/timeframeId"
+			},
+			"response": []
+		},
+		{
+			"name": "delete timeframe doesn't exist",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 204\", function() {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "X-Authorisation",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": "{{BASE_URL}}/timeframe/99999"
+			},
+			"response": []
+		},
+		{
+			"name": "delete session unauthorised",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 401\", function() {",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "{{BASE_URL}}/session/{{newSessionId}}"
+			},
+			"response": []
+		},
+		{
+			"name": "delete session",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 200\", function() {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.environment.set(\"newSessionId\", null);",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "X-Authorisation",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": "{{BASE_URL}}/session/{{newSessionId}}"
+			},
+			"response": []
+		},
+		{
+			"name": "delete session wrong id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 400\", function() {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "X-Authorisation",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": "{{BASE_URL}}/session/sessionId"
+			},
+			"response": []
+		},
+		{
+			"name": "delete session doesn't exist",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 204\", function() {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "X-Authorisation",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": "{{BASE_URL}}/session/999999"
+			},
+			"response": []
+		},
+		{
+			"name": "delete participant unauthorised",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 401\", function() {",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "{{BASE_URL}}/participant/{{newParticipantId}}"
+			},
+			"response": []
+		},
+		{
+			"name": "delete participant",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 200\", function() {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.environment.set(\"newParticipantId\", null);",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "X-Authorisation",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": "{{BASE_URL}}/participant/{{newParticipantId}}"
+			},
+			"response": []
+		},
+		{
+			"name": "delete participant doesn't exist",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 204\", function() {",
+							"    pm.response.to.have.status(204);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "X-Authorisation",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": "{{BASE_URL}}/participant/99999"
+			},
+			"response": []
+		},
+		{
+			"name": "logout",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 200\", function() {",
+							"    pm.response.to.have.status(200);",
+							"    pm.environment.set(\"token\", null);",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-Authorisation",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": "{{BASE_URL}}/admin/logout"
+			},
+			"response": []
+		},
+		{
+			"name": "invalid logout",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 401\", function() {",
+							"    pm.response.to.have.status(401);",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": "{{BASE_URL}}/admin/logout"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
