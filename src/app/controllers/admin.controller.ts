@@ -3,10 +3,22 @@ import Logger from '../../config/logger';
 import * as Admin from '../models/admin.model';
 import * as Password from '../services/password';
 import {uid} from 'rand-token';
+import { validate } from '../services/validator';
+import * as schema from '../resources/validation_schema.json';
 
 // Administrator login
 const login = async (req: Request, res: Response): Promise<void> => {
     try {
+        const validation = await validate(
+            schema.login_admin,
+            req.body);
+
+        if (validation !== true) {
+            res.statusMessage = `Bad Request: ${validation.toString()}`;
+            res.status(400).send();
+            return;
+        }
+
         const admin = await Admin.getAdministratorByUsername(req.body.username);
 
         if(admin == null || !(await Password.compare(req.body.password, admin.password))) {

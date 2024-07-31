@@ -1,0 +1,177 @@
+{
+    "login_admin": {
+        "type": "object",
+        "properties": {
+            "username": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+            },
+            "password": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+            }
+        },
+        "required": [
+            "username",
+            "password"
+        ],
+        "additionalProperties": false
+    },
+    "create_participant": {
+        "type": "object",
+        "properties": {
+            "firstName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+            },
+            "lastName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+            },
+            "email": {
+                "type": "string",
+                "format": "email",
+                "minLength": 1,
+                "maxLength": 256
+            },
+            "age": {
+                "type": "integer",
+                "minimum": 0
+            },
+            "gender": {
+                "type": "string",
+                "enum": [
+                    "MALE",
+                    "FEMALE"
+                ]
+            },
+            "activityLevel": {
+                "type": "string",
+                "enum": [
+                    "SEDENTARY",
+                    "LIGHTLYACTIVE",
+                    "MODERATELYACTIVE",
+                    "VERYACTIVE"
+                ]
+            },
+            "hasAcceptedTerms": {
+                "type": "boolean"
+            }
+        },
+        "required": [
+            "firstName",
+            "lastName",
+            "email",
+            "age",
+            "gender",
+            "activityLevel",
+            "hasAcceptedTerms"
+        ],
+        "additionalProperties": false
+    },
+    "create_session": {
+        "type": "object",
+        "properties": {
+            "participantId": {
+                "type": "integer",
+                "minimum": 0
+            },
+            "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+            },
+            "startTime": {
+                "type": "string",
+                "format": "datetime"
+            },
+            "endTime": {
+                "type": "string",
+                "format": "datetime"
+            },
+            "data": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "value": {
+                            "type": "number"
+                        },
+                        "time": {
+                            "type": "string",
+                            "format": "datetime"
+                        }
+                    },
+                    "required": [
+                        "value",
+                        "time"
+                    ]
+                }
+            }
+        },
+        "required": [
+            "participantId",
+            "name",
+            "startTime",
+            "endTime",
+            "data"
+        ],
+        "additionalProperties": false
+    },
+    "create_timeframe": {
+        "type": "object",
+        "properties": {
+            "sessionId": {
+                "type": "integer",
+                "minimum": 0
+            },
+            "description": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+            },
+            "startTime": {
+                "type": "string",
+                "format": "datetime"
+            },
+            "endTime": {
+                "type": "string",
+                "format": "datetime"
+            }
+        },
+        "required": [
+            "sessionId",
+            "description",
+            "startTime",
+            "endTime"
+        ],
+        "additionalProperties": false
+    },
+    "patch_timeframe": {
+        "type": "object",
+        "properties": {
+            "sessionId": {
+                "type": "integer",
+                "minimum": 0
+            },
+            "description": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+            },
+            "startTime": {
+                "type": "string",
+                "format": "datetime"
+            },
+            "endTime": {
+                "type": "string",
+                "format": "datetime"
+            }
+        },
+        "additionalProperties": false
+    }
+}

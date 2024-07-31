@@ -1,10 +1,23 @@
 import { Request, Response } from 'express';
 import Logger from '../../config/logger';
 import * as Participant from '../models/participant.model';
+import { validate } from '../services/validator';
+import * as schema from '../resources/validation_schema.json';
 
 // Create a participant
 const createParticipant = async (req: Request, res: Response): Promise<void> => {
     try {
+
+        const validation = await validate(
+            schema.create_participant,
+            req.body);
+
+        if (validation !== true) {
+            res.statusMessage = `Bad Request: ${validation.toString()}`;
+            res.status(400).send();
+            return;
+        }
+
         const newParticipant: ParticipantRegister = {
             firstName: req.body.firstName,
             lastName: req.body.lastName,
@@ -52,10 +65,18 @@ const getParticipants = async (req: Request, res: Response): Promise<void> => {
 const getParticipant = async (req: Request, res: Response): Promise<void> => {
     try {
         const id = parseInt(req.params.id, 10);
+
+        if (isNaN(id)) {
+            res.statusMessage = "Id must be an integer"
+            res.status(400).send();
+            return;
+        }
+
         const participant: Participant | null = await Participant.getParticipant(id);
 
         if(participant == null) {
             res.status(404).send('Participant not found');
+            return;
         }
 
         res.status(200).send(participant);
@@ -64,6 +85,7 @@ const getParticipant = async (req: Request, res: Response): Promise<void> => {
         Logger.error(err);
         res.statusMessage = 'Internal server error';
         res.status(500).send();
+        return;
     }
 }
 
@@ -72,6 +94,13 @@ const getParticipant = async (req: Request, res: Response): Promise<void> => {
 const deleteParticipant = async (req: Request, res: Response): Promise<void> => {
     try {
         const id = parseInt(req.params.id, 10);
+
+        if (isNaN(id)) {
+            res.statusMessage = "Id must be an integer"
+            res.status(400).send();
+            return;
+        }
+
         const rowsAffected = await Participant.deleteParticipant(id);
 
         if(rowsAffected > 0) {

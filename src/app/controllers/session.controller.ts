@@ -1,10 +1,23 @@
 import { Request, Response } from 'express';
 import Logger from '../../config/logger';
 import * as Session from '../models/session.model';
+import { validate } from '../services/validator';
+import * as schema from '../resources/validation_schema.json';
 
 
 const createSession = async (req: Request, res: Response): Promise<void> => {
     try {
+
+        const validation = await validate(
+            schema.create_session,
+            req.body);
+
+        if (validation !== true) {
+            res.statusMessage = `Bad Request: ${validation.toString()}`;
+            res.status(400).send();
+            return;
+        }
+
         const session: SessionCreate = {
             participantId: req.body.participantId as number,
             name: req.body.name,
@@ -35,6 +48,13 @@ const createSession = async (req: Request, res: Response): Promise<void> => {
 const getSession = async (req: Request, res: Response): Promise<void> => {
     try {
         const id = parseInt(req.params.id, 10);
+
+        if (isNaN(id)) {
+            res.statusMessage = "Id must be an integer"
+            res.status(400).send();
+            return;
+        }
+
         const session: Session | null = await Session.getSessionById(id);
 
         if(session == null) {
@@ -55,6 +75,12 @@ const getSession = async (req: Request, res: Response): Promise<void> => {
 const deleteSession = async (req: Request, res: Response): Promise<void> => {
     try {
         const id = parseInt(req.params.id, 10);
+
+        if (isNaN(id)) {
+            res.statusMessage = "Id must be an integer"
+            res.status(400).send();
+            return;
+        }
         const rowsAffected = await Session.deleteSession(id);
 
         if(rowsAffected > 0) {

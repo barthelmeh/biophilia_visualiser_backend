@@ -1,9 +1,22 @@
 import { Request, Response } from 'express';
 import Logger from '../../config/logger';
 import * as Timeframe from '../models/timeframe.model';
+import { validate } from '../services/validator';
+import * as schema from '../resources/validation_schema.json';
 
 const createTimeframe = async (req: Request, res: Response): Promise<void> => {
     try {
+
+        const validation = await validate(
+            schema.create_timeframe,
+            req.body);
+
+        if (validation !== true) {
+            res.statusMessage = `Bad Request: ${validation.toString()}`;
+            res.status(400).send();
+            return;
+        }
+
         const timeframe: TimeframeCreate = {
             sessionId: req.body.sessionId as number,
             description: req.body.description,
@@ -32,6 +45,13 @@ const createTimeframe = async (req: Request, res: Response): Promise<void> => {
 const deleteTimeframe = async (req: Request, res: Response): Promise<void> => {
     try {
         const id = parseInt(req.params.id, 10);
+
+        if (isNaN(id)) {
+            res.statusMessage = "Id must be an integer"
+            res.status(400).send();
+            return;
+        }
+
         const rowsAffected = await Timeframe.deleteTimeframe(id);
 
         if(rowsAffected > 0) {
@@ -52,6 +72,22 @@ const deleteTimeframe = async (req: Request, res: Response): Promise<void> => {
 const updateTimeframe = async (req: Request, res: Response): Promise<void> => {
     try {
         const id = parseInt(req.params.id, 10);
+
+        if (isNaN(id)) {
+            res.statusMessage = "Id must be an integer"
+            res.status(400).send();
+            return;
+        }
+
+        const validation = await validate(
+            schema.patch_timeframe,
+            req.body);
+
+        if (validation !== true) {
+            res.statusMessage = `Bad Request: ${validation.toString()}`;
+            res.status(400).send();
+            return;
+        }
 
         const updatedTimeframe: TimeframeUpdate = {
             ...req.body,
