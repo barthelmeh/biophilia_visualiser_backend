@@ -18,7 +18,7 @@ export default () => {
 
     // ROUTES
     require('../app/routes/admin.routes')(app);
-    require('../app/routes/user.routes')(app);
+    require('../app/routes/participant.routes')(app);
     require('../app/routes/session.routes')(app);
     require('../app/routes/timeframe.routes')(app);
 

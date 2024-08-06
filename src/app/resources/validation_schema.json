@@ -57,9 +57,6 @@
                     "MODERATELYACTIVE",
                     "VERYACTIVE"
                 ]
-            },
-            "hasAcceptedTerms": {
-                "type": "boolean"
             }
         },
         "required": [
@@ -68,9 +65,53 @@
             "email",
             "age",
             "gender",
-            "activityLevel",
-            "hasAcceptedTerms"
+            "activityLevel"
         ],
+        "additionalProperties": false
+    },
+    "patch_participant": {
+        "type": "object",
+        "properties": {
+            "firstName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+            },
+            "lastName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+            },
+            "email": {
+                "type": "string",
+                "format": "email",
+                "minLength": 1,
+                "maxLength": 256
+            },
+            "age": {
+                "type": "integer",
+                "minimum": 0
+            },
+            "gender": {
+                "type": "string",
+                "enum": [
+                    "MALE",
+                    "FEMALE"
+                ]
+            },
+            "activityLevel": {
+                "type": "string",
+                "enum": [
+                    "SEDENTARY",
+                    "LIGHTLYACTIVE",
+                    "MODERATELYACTIVE",
+                    "VERYACTIVE"
+                ]
+            },
+            "hasAcceptedTerms": {
+                "type": "boolean"
+            }
+        },
         "additionalProperties": false
     },
     "create_session": {

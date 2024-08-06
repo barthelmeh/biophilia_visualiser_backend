@@ -17,4 +17,7 @@ module.exports = (app: Express) => {
     app.route(rootUrl + '/participant/:id')
     .delete(authenticate, participant.deleteParticipant);
 
+    app.route(rootUrl + '/participant/:id')
+    .patch(authenticate, participant.patchParticipant);
+
 }

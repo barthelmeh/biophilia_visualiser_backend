@@ -61,10 +61,11 @@ const getParticipant = async (id: number): Promise<Participant | null> => {
 
 const registerParticipant = async (participant: ParticipantRegister): Promise<number | null> => {
     const query = `
-        INSERT INTO Participant (FirstName, LastName, Email, Age, ActivityLevel, Gender, HasAcceptedTerms)
-        VALUES (@FirstName, @LastName, @Email, @Age, @ActivityLevel, @Gender, @HasAcceptedTerms);
+        INSERT INTO Participant (FirstName, LastName, Email, Age, ActivityLevel, Gender)
+        VALUES (@FirstName, @LastName, @Email, @Age, @ActivityLevel, @Gender);
         SELECT SCOPE_IDENTITY() as id;
     `;
+
     const result = await getPool().request()
         .input('FirstName', participant.firstName)
         .input('LastName', participant.lastName)
@@ -72,7 +73,6 @@ const registerParticipant = async (participant: ParticipantRegister): Promise<nu
         .input('Age', participant.age)
         .input('ActivityLevel', participant.activityLevel)
         .input('Gender', participant.gender)
-        .input('HasAcceptedTerms', participant.hasAcceptedTerms)
         .query(query);
 
     if(result.recordset.length > 0) {
@@ -135,4 +135,77 @@ const deleteParticipant = async (participantId: number): Promise<number | null> 
     }
 };
 
-export { registerParticipant, getAllParticipants, getParticipant, deleteParticipant }
+const updateParticipant = async (updatedParticipant: ParticipantUpdate): Promise<number> => {
+    const pool = getPool();
+    const transaction = new sql.Transaction(pool);
+
+    try {
+        await transaction.begin();
+
+        // Build the set clause using the provided params
+        const updateFields = [];
+        const params: {name: string, value: string | number | boolean}[] = [];
+
+        if(updatedParticipant.firstName) {
+            updateFields.push(`[FirstName] = @firstName`);
+            params.push({ name: 'firstName', value: updatedParticipant.firstName });
+        }
+
+        if(updatedParticipant.lastName) {
+            updateFields.push(`[LastName] = @lastName`);
+            params.push({ name: 'lastName', value: updatedParticipant.lastName });
+        }
+
+        if(updatedParticipant.age) {
+            updateFields.push(`[Age] = @age`);
+            params.push({ name: 'age', value: updatedParticipant.age });
+        }
+
+        if (updatedParticipant.email) {
+            updateFields.push(`[Email] = @email`);
+            params.push({ name: 'email', value: updatedParticipant.email });
+        }
+
+        if (updatedParticipant.activityLevel) {
+            updateFields.push(`[ActivityLevel] = @activityLevel`);
+            params.push({ name: 'activityLevel', value: updatedParticipant.activityLevel });
+        }
+
+        if(updatedParticipant.gender) {
+            updateFields.push(`[Gender] = @gender`);
+            params.push({ name: 'gender', value: updatedParticipant.gender });
+        }
+
+        if(updatedParticipant.hasAcceptedTerms) {
+            updateFields.push(`[HasAcceptedTerms] = @hasAcceptedTerms`);
+            params.push({ name: 'hasAcceptedTerms', value: updatedParticipant.hasAcceptedTerms });
+        }
+
+        if(updateFields.length === 0) {
+            return 0;
+        }
+
+        const query = `
+            UPDATE Participant
+            SET ${updateFields.join(', ')}
+            WHERE Id = @id;
+        `;
+
+        const request = transaction.request();
+        params.forEach(param => request.input(param.name, param.value));
+
+        // Add the id of the timeframe
+        request.input('id', updatedParticipant.id);
+
+        const result = await request.query(query);
+        await transaction.commit();
+
+        return result.rowsAffected[0];
+
+    } catch (err) {
+        await transaction.rollback();
+        return 0;
+    }
+}
+
+export { registerParticipant, getAllParticipants, getParticipant, deleteParticipant, updateParticipant }
