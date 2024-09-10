@@ -4,6 +4,18 @@ import * as Session from '../models/session.model';
 import { validate } from '../services/validator';
 import * as schema from '../resources/validation_schema.json';
 
+const getSessions = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const sessions: Session[] = await Session.getAllSessions();
+        res.status(200).send(sessions);
+        return;
+    } catch (err) {
+        Logger.error(err);
+        res.statusMessage = 'Internal server error';
+        res.status(500).send();
+        return;
+    }
+}
 
 const createSession = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -98,4 +110,4 @@ const deleteSession = async (req: Request, res: Response): Promise<void> => {
     }
 }
 
-export { createSession, getSession, deleteSession }
+export { getSessions, createSession, getSession, deleteSession }

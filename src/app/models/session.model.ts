@@ -1,6 +1,39 @@
 import { getPool } from "../../config/db";
 import sql from 'mssql';
 
+const getAllSessions = async (): Promise<Session[] | null> => {
+    // Get the session and data
+    const query = `
+    SELECT
+        s.Id as sessionId,
+        s.ParticipantID as participantId,
+        s.Name as sessionName,
+        s.StartTime as sessionStart,
+        s.EndTime as sessionEnd
+    FROM Session s`;
+    const sessionsResult = await getPool().request()
+        .query(query);
+
+    if(sessionsResult.recordset.length === 0) {
+        return null;
+    }
+
+    const sessions: Session[] = [];
+
+    for(const row of sessionsResult.recordset) {
+        const session: Session = {
+            id: row.sessionId as number,
+            participantId: row.participantId,
+            name: row.sessionName,
+            start: row.sessionStart,
+            end: row.sessionEnd,
+            data: []
+        };
+        sessions.push(session);
+    }
+    return sessions;
+}
+
 // Create a new Session
 const createSession = async (session: SessionCreate): Promise<number | null> => {
 
@@ -162,4 +195,4 @@ const deleteSession = async (sessionId: number): Promise<number> => {
     }
 }
 
-export { createSession, getSessionById, deleteSession }
+export { getAllSessions, createSession, getSessionById, deleteSession }
