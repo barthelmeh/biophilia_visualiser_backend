@@ -104,7 +104,6 @@ const getSessionById = async (sessionId: number): Promise<Session | null> => {
         d.RecordedTime as dataRecordedTime
     FROM Session s
     LEFT JOIN Data d ON s.Id = d.SessionID
-    LEFT JOIN Timeframe t ON s.Id = t.SessionID
     WHERE s.Id = @id
     `;
     const sessionResult = await getPool().request()
