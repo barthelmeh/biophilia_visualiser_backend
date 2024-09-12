@@ -3,12 +3,12 @@ import { connect } from "./config/db";
 import Logger from './config/logger';
 
 const app = express();
-const port = process.env.PORT || 4941;
+const port: number = parseInt(process.env.PORT, 10) || 4941;
 
 async function main() {
   try {
     await connect();
-    app.listen(port, () => {
+    app.listen(port, '0.0.0.0', () => {
       Logger.info(`Listening on port: ${port}`);
     });
   } catch (err) {
