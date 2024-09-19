@@ -6,7 +6,6 @@ import * as schema from '../resources/validation_schema.json';
 
 const createTimeframe = async (req: Request, res: Response): Promise<void> => {
     try {
-
         const validation = await validate(
             schema.create_timeframe,
             req.body);
@@ -22,6 +21,12 @@ const createTimeframe = async (req: Request, res: Response): Promise<void> => {
             description: req.body.description,
             startTime: req.body.startTime,
             endTime: req.body.endTime
+        }
+
+        const doesOverlap = await Timeframe.doesTimeframeOverlap(timeframe);
+        if(doesOverlap) {
+            res.statusMessage = 'Cannot create a timeframe during another timeframe';
+            res.status(409).send();
         }
 
         const insertedId = await Timeframe.createTimeframe(timeframe);

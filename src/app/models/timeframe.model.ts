@@ -19,6 +19,25 @@ const createTimeframe = async (timeframe: TimeframeCreate): Promise<number | nul
     return null;
 }
 
+const doesTimeframeOverlap = async (timeframe: TimeframeCreate): Promise<boolean> => {
+    // Make sure there are no overlaps
+    const overlapCheckQuery = `
+        SELECT 1
+        FROM Timeframe
+        WHERE SessionID = @SessionID
+        AND (
+            (@StartTime < EndTime AND @EndTime > StartTime)
+        );`;
+
+    const overlapResult = await getPool().request()
+        .input('SessionID', timeframe.sessionId)
+        .input('StartTime', timeframe.startTime)
+        .input('EndTime', timeframe.endTime)
+        .query(overlapCheckQuery);
+
+    return overlapResult.recordset.length <= 0;
+}
+
 const deleteTimeframe = async (timeframeId: number): Promise<number> => {
     const query = `DELETE FROM Timeframe WHERE Id = @id`;
     const result = await getPool().request()
@@ -85,4 +104,4 @@ const updateTimeframe = async (updatedTimeframe: TimeframeUpdate): Promise<numbe
     }
 }
 
-export { createTimeframe, deleteTimeframe, updateTimeframe }
+export { createTimeframe, doesTimeframeOverlap, deleteTimeframe, updateTimeframe }
