@@ -25,8 +25,8 @@ const createTimeframe = async (req: Request, res: Response): Promise<void> => {
 
         const doesOverlap = await Timeframe.doesTimeframeOverlap(timeframe);
         if(doesOverlap) {
-            res.statusMessage = 'Cannot create a timeframe during another timeframe';
-            res.status(409).send();
+            res.status(409).send('Cannot create a timeframe during another timeframe');
+            return;
         }
 
         const insertedId = await Timeframe.createTimeframe(timeframe);

@@ -20,7 +20,7 @@ const createTimeframe = async (timeframe: TimeframeCreate): Promise<number | nul
 }
 
 const doesTimeframeOverlap = async (timeframe: TimeframeCreate): Promise<boolean> => {
-    // Make sure there are no overlaps
+
     const overlapCheckQuery = `
         SELECT 1
         FROM Timeframe
@@ -35,7 +35,7 @@ const doesTimeframeOverlap = async (timeframe: TimeframeCreate): Promise<boolean
         .input('EndTime', timeframe.endTime)
         .query(overlapCheckQuery);
 
-    return overlapResult.recordset.length <= 0;
+    return overlapResult.recordset.length > 0;
 }
 
 const deleteTimeframe = async (timeframeId: number): Promise<number> => {
