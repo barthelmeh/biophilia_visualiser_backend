@@ -26,7 +26,7 @@ const doesTimeframeOverlap = async (timeframe: TimeframeCreate): Promise<boolean
         FROM Timeframe
         WHERE SessionID = @SessionID
         AND (
-            (@StartTime < EndTime AND @EndTime > StartTime)
+            (@StartTime <= EndTime AND @EndTime >= StartTime)
         );`;
 
     const overlapResult = await getPool().request()
